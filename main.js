@@ -9,6 +9,5 @@ function doGet() {
   return HtmlService.createTemplateFromFile('cafe-calorie')
       .evaluate() // Process any server-side includes or scripts in the HTML
       .setTitle('Cafe Calorie App'); // Set the title of the web page
-      // Removed .setXFrameOptions(HtmlService.XFrameOptions.ALLOWALL) to resolve TypeError
 }
     
