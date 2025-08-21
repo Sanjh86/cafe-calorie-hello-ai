@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cafe Calorie App</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Basic styling for the select dropdown icon to make it visible */
+    select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem; /* Adjust padding to make space for the icon */
+    }
+    /* Custom scrollbar for a cleaner look */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Modal specific styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    .modal-content {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 90%;
+        width: 400px;
+        text-align: center;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-100 p-4 font-inter antialiased flex flex-col">
+
+  <!-- Header Bar -->
+  <header class="bg-[#33691e] text-white p-4 rounded-lg shadow-md mb-6 flex items-center justify-between">
+    <h1 class="text-2xl font-bold">Cafe Calorie App</h1>
+    <div class="flex space-x-4">
+      <!-- Placeholder Icons (using inline SVG for simplicity and compliance) -->
+      <svg class="w-6 h-6 text-white text-opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+      <svg class="w-6 h-6 text-white text-opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004 16.002c-.381-.475-1.04-1.002-1.753-1.002s-1.37.527-1.753 1.002M20 20v-5h-.582m-15.356-2A8.001 8.001 0 0120 7.998c.381.475 1.04.999 1.753.999s1.37-.525 1.753-.999"></path></svg>
+      <svg class="w-6 h-6 text-white text-opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17l-3 3m0 0l-3-3m3 3V3"></path></svg>
+      <svg class="w-6 h-6 text-white text-opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+    </div>
+  </header>
+
+  <div class="flex flex-col lg:flex-row gap-6 p-4 pt-0 flex-grow">
+    <!-- Left Panel: Daily Goals and Personalized Meal Plan -->
+    <div class="w-full lg:w-1/3 flex flex-col space-y-6">
+      <!-- Your Daily Goals -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Your Daily Goals</h2>
+        <div class="space-y-4">
+          <div>
+            <label for="maxCalories" class="block text-sm font-medium text-gray-700">
+              Max Calories (kcal) <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              id="maxCalories"
+              value="500"
+              placeholder="e.g., 500"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+          <div>
+            <label for="minProtein" class="block text-sm font-medium text-gray-700">
+              Min Protein (g) (optional)
+            </label>
+            <input
+              type="number"
+              id="minProtein"
+              value="20"
+              placeholder="e.g., 20"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+          <div>
+            <label for="maxCarbs" class="block text-sm font-medium text-gray-700">
+              Max Carbs (g) (optional)
+            </label>
+            <input
+              type="number"
+              id="maxCarbs"
+              value="70"
+              placeholder="e.g., 70"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+          <div>
+            <label for="maxFat" class="block text-sm font-medium text-gray-700">
+              Max Fat (g) (optional)
+            </label>
+            <input
+              type="number"
+              id="maxFat"
+              value="20"
+              placeholder="e.g., 20"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+          <div>
+            <label for="dietaryPreference" class="block text-sm font-medium text-gray-700">
+              Dietary Preference
+            </label>
+            <select
+              id="dietaryPreference"
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-green-500 focus:border-green-500"
+            >
+              <option value="Any">Any</option>
+              <option value="Vegan">Vegan</option>
+              <option value="Vegetarian">Vegetarian</option>
+              <option value="Non-Vegetarian">Non-Vegetarian</option>
+            </select>
+          </div>
+        </div>
+        <button
+          id="generateMealPlanBtn"
+          class="mt-6 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150"
+        >
+          Generate Meal Plan
+        </button>
+        <p id="error-message" class="text-red-500 text-sm mt-2 hidden"></p>
+      </div>
+
+      <!-- Your Personalized Meal Plan -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Your Personalized Meal Plan</h2>
+        <div id="mealPlanOutput">
+          <p class="text-gray-600">No meal plan generated yet. Adjust your goals and click "Generate Meal Plan".</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Cafe Menus -->
+    <div class="w-full lg:w-2/3 flex flex-col">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Today's Cafe Menus</h2>
+      <div id="cafeMenusContainer" class="flex-grow overflow-y-auto pr-2">
+        <p class="text-gray-600 text-center">Loading menus...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Modal for Repeated Food Items -->
+  <div id="repeatedFoodModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h3 class="text-lg font-bold mb-4" id="modalMessage"></h3>
+      <div class="flex justify-center space-x-4">
+        <button id="modalConfirmBtn" class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700">Yes, Re-generate</button>
+        <button id="modalCancelBtn" class="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400">No, Keep It</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    // This script will interact with Google Apps Script backend functions.
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const generateBtn = document.getElementById('generateMealPlanBtn');
+      const mealPlanOutput = document.getElementById('mealPlanOutput');
+      const cafeMenusContainer = document.getElementById('cafeMenusContainer');
+      const errorMessage = document.getElementById('error-message');
+      const repeatedFoodModal = document.getElementById('repeatedFoodModal'); // Renamed ID
+      const modalMessage = document.getElementById('modalMessage');
+      const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+      const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+      // Global variable to store all available dishes once fetched
+      let allCafeDishes = [];
+      // Global set to keep track of dishes to exclude from future generations if user doesn't want repetition
+      let dishesToExcludeFromRepetition = new Set();
+
+
+      // Function to display error messages
+      function displayError(message) {
+        errorMessage.textContent = message;
+        errorMessage.classList.remove('hidden');
+      }
+
+      // Function to hide error messages
+      function hideError() {
+        errorMessage.classList.add('hidden');
+        errorMessage.textContent = '';
+      }
+
+      // Function to render a single dish card
+      function renderDishCard(dish, quantity = 1) {
+        const tagsHtml = dish.dietary_tags.map(tag => {
+          let bgColor = 'bg-gray-100';
+          let textColor = 'text-gray-800';
+          if (tag === 'Vegan') {
+            bgColor = 'bg-green-100';
+            textColor = 'text-green-800';
+          } else if (tag === 'Vegetarian') {
+            bgColor = 'bg-blue-100';
+            textColor = 'text-blue-800';
+          } else if (tag === 'Non-Vegetarian') {
+            bgColor = 'bg-red-100';
+            textColor = 'text-red-800';
+          }
+          return `<span class="inline-block mr-2 px-2 py-0.5 rounded-full text-xs font-medium ${bgColor} ${textColor}">
+            ${tag}
+          </span>`;
+        }).join('');
+
+        const displayCalories = (dish.calories * quantity).toFixed(1);
+        const displayProtein = (dish.protein * quantity).toFixed(1);
+        const displayCarbs = (dish.carbs * quantity).toFixed(1);
+        const displayFat = (dish.fat * quantity).toFixed(1);
+        
+        // Format serving size: show as integer if it's a whole number, otherwise toFixed(1)
+        const displayServing = Number.isInteger(quantity) ? quantity : quantity.toFixed(1);
+
+        return `
+          <div class="bg-white p-4 rounded-lg shadow-sm mb-2">
+            <h5 class="text-md font-semibold text-gray-800">${dish.name}</h5>
+            <div class="text-sm text-gray-600">
+              ${tagsHtml}
+            </div>
+            <p class="text-gray-700 text-sm mt-1">
+              Serving: ${displayServing} ${dish.serving_unit}
+            </p>
+            <p class="text-gray-700 text-sm">
+              Calories: ${displayCalories} kcal | Protein: ${displayProtein}g | Carbs: ${displayCarbs}g | Fat: ${displayFat}g
+            </p>
+          </div>
+        `;
+      }
+
+      // Function to render a single cafe menu
+      function renderCafeMenu(cafe) {
+        let stationsHtml = '';
+        cafe.stations.forEach(station => {
+          // Initially, all stations are collapsed.
+          let dishesHtml = '';
+          station.dishes.forEach(dish => {
+            // For general menu display, show 1 serving
+            dishesHtml += renderDishCard(dish, 1);
+          });
+
+          stationsHtml += `
+            <div class="mb-4">
+              <button class="w-full text-left py-2 px-3 bg-gray-50 hover:bg-gray-100 rounded-md flex justify-between items-center station-toggle-btn" data-station-name="${station.name}">
+                <h4 class="text-lg font-semibold text-gray-800">${station.name}</h4>
+                <svg class="w-5 h-5 transition-transform duration-200 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+              </button>
+              <div class="mt-2 pl-4 border-l-2 border-gray-200 hidden station-dishes" data-station-name="${station.name}">
+                ${dishesHtml}
+              </div>
+            </div>
+          `;
+        });
+
+        return `
+          <div class="bg-white p-4 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">${cafe.name}</h2>
+            <!-- Cafe Image -->
+            <div class="mb-4 rounded-lg overflow-hidden shadow-sm">
+              <img src="${cafe.image_url}" alt="${cafe.name} Cafe" class="w-full h-48 object-cover">
+            </div>
+            ${stationsHtml}
+          </div>
+        `;
+      }
+
+      // Success handler for fetching cafe data from Apps Script
+      function onGetCafeDataSuccess(data) {
+        hideError();
+        if (data && data.length > 0) {
+          allCafeDishes = data.flatMap(cafe => cafe.stations.flatMap(station => station.dishes)); // Store all dishes globally
+          let allMenusHtml = '';
+          data.forEach(cafe => {
+            allMenusHtml += renderCafeMenu(cafe);
+          });
+          cafeMenusContainer.innerHTML = allMenusHtml;
+
+          // Add event listeners for station toggles
+          document.querySelectorAll('.station-toggle-btn').forEach(button => {
+            button.addEventListener('click', function() {
+              const stationName = this.dataset.stationName;
+              const dishesContainer = document.querySelector(`.station-dishes[data-station-name="${stationName}"]`);
+              const icon = this.querySelector('svg');
+
+              if (dishesContainer.classList.contains('hidden')) {
+                dishesContainer.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+              } else {
+                dishesContainer.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+              }
+            });
+          });
+
+        } else {
+          cafeMenusContainer.innerHTML = '<p class="text-gray-600 text-center">No cafe menus available.</p>';
+        }
+        // After menus are loaded, generate the initial meal plan
+        handleGenerateMealPlan();
+      }
+
+      // Failure handler for Apps Script calls
+      function onAppsScriptError(error) {
+        console.error("Apps Script Error:", error.message);
+        displayError("An error occurred: " + error.message);
+        cafeMenusContainer.innerHTML = '<p class="text-red-500 text-center">Failed to load menus. Please try again later.</p>';
+        mealPlanOutput.innerHTML = '<p class="text-red-500 text-center">Failed to generate meal plan.</p>';
+      }
+
+      // Function to handle meal plan generation
+      function handleGenerateMealPlan() {
+        hideError();
+        mealPlanOutput.innerHTML = '<p class="text-gray-600 text-center">Generating meal plan...</p>';
+
+        const maxCalories = parseFloat(document.getElementById('maxCalories').value) || Infinity;
+        const minProtein = parseFloat(document.getElementById('minProtein').value) || 0;
+        const maxCarbs = parseFloat(document.getElementById('maxCarbs').value) || Infinity;
+        const maxFat = parseFloat(document.getElementById('maxFat').value) || Infinity;
+        const dietaryPreference = document.getElementById('dietaryPreference').value;
+
+        const goals = { maxCalories, minProtein, maxCarbs, maxFat, dietaryPreference };
+
+        // Call Apps Script function to generate meal plan
+        google.script.run
+          .withSuccessHandler(function(result) {
+            if (result && result.meal && result.meal.length > 0) {
+              const totalNutrientsHtml = `
+                <div class="mb-4">
+                  <h3 class="text-lg font-semibold text-gray-800">Total Meal Nutrients:</h3>
+                  <p class="text-gray-700">Calories: ${result.nutrients.calories.toFixed(1)} kcal</p>
+                  <p class="text-gray-700">Protein: ${result.nutrients.protein.toFixed(1)}g</p>
+                  <p class="text-gray-700">Carbs: ${result.nutrients.carbs.toFixed(1)}g</p>
+                  <p class="text-gray-700">Fat: ${result.nutrients.fat.toFixed(1)}g</p>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Recommended Dishes:</h3>
+                <div class="space-y-2">
+                  ${result.meal.map(item => `
+                    <div class="bg-gray-50 p-3 rounded-md border border-gray-200">
+                      <p class="font-medium text-gray-800">${item.dish.name}</p>
+                      <p class="text-sm text-gray-600">
+                        Serving: ${Number.isInteger(item.quantity) ? item.quantity : item.quantity.toFixed(1)} ${item.dish.serving_unit}
+                      </p>
+                      <p class="text-sm text-gray-600">
+                        Calories: ${(item.dish.calories * item.quantity).toFixed(1)} kcal | Protein: ${(item.dish.protein * item.quantity).toFixed(1)}g | Carbs: ${(item.dish.carbs * item.quantity).toFixed(1)}g | Fat: ${(item.dish.fat * item.quantity).toFixed(1)}g
+                      </p>
+                      <div class="text-sm text-gray-600 mt-1">
+                        ${item.dish.dietary_tags.map(tag => {
+                          let bgColor = 'bg-gray-100';
+                          let textColor = 'text-gray-800';
+                          if (tag === 'Vegan') {
+                            bgColor = 'bg-green-100';
+                            textColor = 'text-green-800';
+                          } else if (tag === 'Vegetarian') {
+                            bgColor = 'bg-blue-100';
+                            textColor = 'text-blue-800';
+                          } else if (tag === 'Non-Vegetarian') {
+                            bgColor = 'bg-red-100';
+                            textColor = 'text-red-800';
+                          }
+                          return `<span class="inline-block mr-2 px-2 py-0.5 rounded-full text-xs font-medium ${bgColor} ${textColor}">
+                            ${tag}
+                          </span>`;
+                        }).join('')}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+                <p class="text-sm text-gray-500 mt-4 italic">
+                  *If an exact match isn't found, future versions could use generative AI to suggest creative meal adaptations from available ingredients.*
+                </p>
+              `;
+              mealPlanOutput.innerHTML = totalNutrientsHtml;
+
+              // Check for repetition of distinct food items (not just total quantity)
+              const distinctDishNamesInMeal = new Set();
+              let hasRepetition = false;
+              let repeatedDishName = '';
+
+              // Count occurrences of each distinct dish name
+              const dishNameOccurrences = {};
+              result.meal.forEach(item => {
+                dishNameOccurrences[item.dish.name] = (dishNameOccurrences[item.dish.name] || 0) + 1;
+              });
+
+              for (const dishName in dishNameOccurrences) {
+                if (dishNameOccurrences[dishName] > 1) { // If a distinct dish name appears more than once
+                  hasRepetition = true;
+                  repeatedDishName = dishName;
+                  break;
+                }
+              }
+
+              if (hasRepetition) {
+                modalMessage.textContent = `Your meal plan includes "${repeatedDishName}" more than once. Would you like to re-generate without repeating this item?`;
+                repeatedFoodModal.classList.remove('hidden'); // Use the correct modal ID
+
+                // Set up event listeners for modal buttons
+                modalConfirmBtn.onclick = function() {
+                  repeatedFoodModal.classList.add('hidden');
+                  dishesToExcludeFromRepetition.add(repeatedDishName); // Add to exclusion list
+                  handleGenerateMealPlan(); // Re-generate meal plan
+                };
+
+                modalCancelBtn.onclick = function() {
+                  repeatedFoodModal.classList.add('hidden');
+                  // Do nothing, keep the current meal plan
+                };
+              } else {
+                // If no repetition, clear the exclusion list for next manual generation
+                dishesToExcludeFromRepetition.clear();
+              }
+
+            } else {
+              mealPlanOutput.innerHTML = '<p class="text-gray-600">No meal plan found for your criteria. Try adjusting your goals.</p>';
+              dishesToExcludeFromRepetition.clear(); // Clear exclusions if no plan is found
+            }
+          })
+          .withFailureHandler(onAppsScriptError)
+          .generateMealPlan(goals, allCafeDishes, Array.from(dishesToExcludeFromRepetition)); // Pass exclusions to backend
+      }
+
+      // Initial load of cafe data when the page loads
+      google.script.run
+        .withSuccessHandler(onGetCafeDataSuccess) // This will also trigger handleGenerateMealPlan
+        .withFailureHandler(onAppsScriptError)
+        .getMockCafeData(); // Call the Apps Script function to get data
+
+      // Event listener for the Generate Meal Plan button
+      generateBtn.addEventListener('click', handleGenerateMealPlan);
+    });
+  </script>
+</body>
+</html>
