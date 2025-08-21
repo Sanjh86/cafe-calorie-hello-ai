@@ -12,7 +12,7 @@
     body {
       font-family: 'Inter', sans-serif;
     }
-    /* Basic styling for the select dropdown icon to make it visible */
+  
     select {
         -webkit-appearance: none;
         -moz-appearance: none;
@@ -23,7 +23,7 @@
         background-size: 1.5em 1.5em;
         padding-right: 2.5rem; /* Adjust padding to make space for the icon */
     }
-    /* Custom scrollbar for a cleaner look */
+    
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -40,7 +40,7 @@
         background: #555;
     }
 
-    /* Modal specific styles */
+    
     .modal-overlay {
         position: fixed;
         top: 0;
@@ -66,7 +66,7 @@
 </head>
 <body class="min-h-screen bg-gray-100 p-4 font-inter antialiased flex flex-col">
 
-  <!-- Header Bar -->
+  
   <header class="bg-[#33691e] text-white p-4 rounded-lg shadow-md mb-6 flex items-center justify-between">
     <h1 class="text-2xl font-bold">Cafe Calorie App</h1>
     <div class="flex space-x-4">
@@ -188,7 +188,6 @@
 
 
   <script>
-    // This script will interact with Google Apps Script backend functions.
 
     document.addEventListener('DOMContentLoaded', function() {
       const generateBtn = document.getElementById('generateMealPlanBtn');
@@ -199,8 +198,7 @@
       const modalMessage = document.getElementById('modalMessage');
       const modalConfirmBtn = document.getElementById('modalConfirmBtn');
       const modalCancelBtn = document.getElementById('modalCancelBtn');
-
-      // Global variable to store all available dishes once fetched
+      
       let allCafeDishes = [];
       // Global set to keep track of dishes to exclude from future generations if user doesn't want repetition
       let dishesToExcludeFromRepetition = new Set();
@@ -243,7 +241,6 @@
         const displayCarbs = (dish.carbs * quantity).toFixed(1);
         const displayFat = (dish.fat * quantity).toFixed(1);
         
-        // Format serving size: show as integer if it's a whole number, otherwise toFixed(1)
         const displayServing = Number.isInteger(quantity) ? quantity : quantity.toFixed(1);
 
         return `
@@ -298,7 +295,6 @@
         `;
       }
 
-      // Success handler for fetching cafe data from Apps Script
       function onGetCafeDataSuccess(data) {
         hideError();
         if (data && data.length > 0) {
@@ -309,7 +305,7 @@
           });
           cafeMenusContainer.innerHTML = allMenusHtml;
 
-          // Add event listeners for station toggles
+
           document.querySelectorAll('.station-toggle-btn').forEach(button => {
             button.addEventListener('click', function() {
               const stationName = this.dataset.stationName;
@@ -329,11 +325,11 @@
         } else {
           cafeMenusContainer.innerHTML = '<p class="text-gray-600 text-center">No cafe menus available.</p>';
         }
-        // After menus are loaded, generate the initial meal plan
+
         handleGenerateMealPlan();
       }
 
-      // Failure handler for Apps Script calls
+
       function onAppsScriptError(error) {
         console.error("Apps Script Error:", error.message);
         displayError("An error occurred: " + error.message);
@@ -341,7 +337,7 @@
         mealPlanOutput.innerHTML = '<p class="text-red-500 text-center">Failed to generate meal plan.</p>';
       }
 
-      // Function to handle meal plan generation
+
       function handleGenerateMealPlan() {
         hideError();
         mealPlanOutput.innerHTML = '<p class="text-gray-600 text-center">Generating meal plan...</p>';
@@ -354,7 +350,7 @@
 
         const goals = { maxCalories, minProtein, maxCarbs, maxFat, dietaryPreference };
 
-        // Call Apps Script function to generate meal plan
+
         google.script.run
           .withSuccessHandler(function(result) {
             if (result && result.meal && result.meal.length > 0) {
