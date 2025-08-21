@@ -98,7 +98,7 @@ function getMockCafeData() {
             { name: 'Green Detox Smoothie', calories: 150, protein: 5, carbs: 25, fat: 2, dietary_tags: ['Vegan'], serving_size: 1, serving_unit: 'glass', type: 'beverage' },
           ],
         },
-        { // Added new Beverages station for Air Cafe
+        { 
           name: 'Beverages',
           dishes: [
             { name: 'Iced Coffee', calories: 120, protein: 2, carbs: 20, fat: 4, dietary_tags: ['Vegetarian'], serving_size: 1, serving_unit: 'cup', type: 'beverage' },
